@@ -64,9 +64,45 @@
             <!-- Campo de texto para Observações adicionais -->
             <div>
                 <label for="observation" class="block text-gray-700 text-sm font-semibold mb-1">Observação:</label>
-                <textarea id="observation" name="observation" rows="3"
+                <textarea id="observation" name="observation" rows="3" required
                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                           placeholder="Adicione qualquer observação aqui..."></textarea>
+            </div>
+
+            <!-- Foto da Placa -->
+            <div>
+                <label for="photo_plate_file" class="block text-gray-700 text-sm font-semibold mb-1">Foto da Placa:</label>
+                <input type="file" id="photo_plate_file" accept="image/*" capture="environment"
+                       class="mt-1 block w-full text-sm text-gray-700" />
+                <img id="preview_photo_plate" class="mt-2 max-h-48" style="display:none;" />
+                <input type="hidden" name="photo_plate" id="photo_plate" />
+            </div>
+
+            <!-- Foto do Condutor -->
+            <div>
+                <label for="photo_driver_file" class="block text-gray-700 text-sm font-semibold mb-1">Foto do Condutor:</label>
+                <input type="file" id="photo_driver_file" accept="image/*" capture="environment"
+                       class="mt-1 block w-full text-sm text-gray-700" />
+                <img id="preview_photo_driver" class="mt-2 max-h-48" style="display:none;" />
+                <input type="hidden" name="photo_driver" id="photo_driver" />
+            </div>
+
+            <!-- Foto do Conteúdo -->
+            <div>
+                <label for="photo_content_file" class="block text-gray-700 text-sm font-semibold mb-1">Foto do Conteúdo:</label>
+                <input type="file" id="photo_content_file" accept="image/*" capture="environment"
+                       class="mt-1 block w-full text-sm text-gray-700" />
+                <img id="preview_photo_content" class="mt-2 max-h-48" style="display:none;" />
+                <input type="hidden" name="photo_content" id="photo_content" />
+            </div>
+
+            <!-- Foto do Documento -->
+            <div>
+                <label for="photo_document_file" class="block text-gray-700 text-sm font-semibold mb-1">Foto do Documento:</label>
+                <input type="file" id="photo_document_file" accept="image/*" capture="environment"
+                       class="mt-1 block w-full text-sm text-gray-700" />
+                <img id="preview_photo_document" class="mt-2 max-h-48" style="display:none;" />
+                <input type="hidden" name="photo_document" id="photo_document" />
             </div>
 
             <!-- Botão de submissão do formulário, com estilo completo do Tailwind -->
@@ -76,5 +112,32 @@
             </button>
         </form>
     </div>
+<script>
+    function setupPhotoInput(fileInputId, hiddenInputId, previewId) {
+        const fileInput = document.getElementById(fileInputId);
+        const hiddenInput = document.getElementById(hiddenInputId);
+        const previewImg = document.getElementById(previewId);
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    hiddenInput.value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupPhotoInput('photo_plate_file', 'photo_plate', 'preview_photo_plate');
+        setupPhotoInput('photo_driver_file', 'photo_driver', 'preview_photo_driver');
+        setupPhotoInput('photo_content_file', 'photo_content', 'preview_photo_content');
+        setupPhotoInput('photo_document_file', 'photo_document', 'preview_photo_document');
+    });
+</script>
 </body>
 </html>

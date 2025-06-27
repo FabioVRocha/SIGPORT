@@ -74,15 +74,20 @@ def create_app():
         )
         if open_entry:
             abort(400, 'Plate already has an open entry')
+        required_fields = ['release', 'activity', 'observation', 'photo_plate', 'photo_driver']
+        for field in required_fields:
+            if not data.get(field):
+                abort(400, f'{field} is required')
+
         entry = Entry(
             plate=data['plate'],
             driver=data['driver'],
             passenger=data.get('passenger'),
-            release=data.get('release'),
-            activity=data.get('activity'),
-            observation=data.get('observation'),
-            photo_plate=data.get('photo_plate'),
-            photo_driver=data.get('photo_driver'),
+            release=data['release'],
+            activity=data['activity'],
+            observation=data['observation'],
+            photo_plate=data['photo_plate'],
+            photo_driver=data['photo_driver'],
             photo_content=data.get('photo_content'),
             photo_document=data.get('photo_document'),
         )
