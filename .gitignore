@@ -1,0 +1,6 @@
+# Ignore extraction artifacts
+/doc_content/
+/doc.txt
+/doc_text.txt
+__pycache__/
+*.pyc
