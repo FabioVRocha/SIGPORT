@@ -17,6 +17,10 @@ def create_app():
     def index():
         return redirect(url_for('login_form'))
 
+    @app.route('/index')
+    def main_menu():
+        return render_template('index.html')
+
     @app.route('/login', methods=['GET'])
     def login_form():
         return render_template('login.html')
@@ -59,7 +63,9 @@ def create_app():
         data = request.get_json() if request.is_json else request.form
         user = User.query.filter_by(username=data['username']).first()
         if user and user.check_password(data['password']):
-            return jsonify({'message': 'login ok'})
+            if request.is_json:
+                return jsonify({'message': 'login ok'})
+            return redirect(url_for('main_menu'))
         abort(401, 'Invalid credentials')
 
     @app.route('/entries', methods=['POST'])
