@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, render_template, redirect, url_for
 
 from config import DATABASE_URI, SECRET_KEY
 from models import db, User, Entry, Exit, Schedule
@@ -13,11 +13,36 @@ def create_app():
     app.config['SECRET_KEY'] = SECRET_KEY
     db.init_app(app)
 
+    @app.route('/')
+    def index():
+        return redirect(url_for('login_form'))
+
+    @app.route('/login', methods=['GET'])
+    def login_form():
+        return render_template('login.html')
+
+    @app.route('/users/new')
+    def user_form():
+        return render_template('user_form.html')
+
+    @app.route('/entries/new')
+    def entry_form():
+        return render_template('entry_form.html')
+
+    @app.route('/entries/<int:entry_id>/exit/new')
+    def exit_form(entry_id):
+        entry = Entry.query.get_or_404(entry_id)
+        return render_template('exit_form.html', entry=entry)
+
+    @app.route('/schedules/new')
+    def schedule_form():
+        return render_template('schedule_form.html')
+
     @app.route('/users', methods=['POST'])
     def create_user():
-        data = request.json
+        data = request.get_json() if request.is_json else request.form
         if not data:
-            abort(400, 'Missing JSON payload')
+            abort(400, 'Missing payload')
         user = User(cpf=data['cpf'], name=data['name'], username=data['username'])
         user.set_password(data['password'])
         db.session.add(user)
@@ -31,7 +56,7 @@ def create_app():
 
     @app.route('/login', methods=['POST'])
     def login():
-        data = request.json
+        data = request.get_json() if request.is_json else request.form
         user = User.query.filter_by(username=data['username']).first()
         if user and user.check_password(data['password']):
             return jsonify({'message': 'login ok'})
@@ -39,7 +64,7 @@ def create_app():
 
     @app.route('/entries', methods=['POST'])
     def create_entry():
-        data = request.json
+        data = request.get_json() if request.is_json else request.form
         # check if plate already inside
         open_entry = (
             Entry.query.filter_by(plate=data['plate'])
@@ -87,7 +112,7 @@ def create_app():
         entry = Entry.query.get_or_404(entry_id)
         if entry.exit:
             abort(400, 'Exit already registered for this entry')
-        data = request.json
+        data = request.get_json() if request.is_json else request.form
         exit_record = Exit(
             entry=entry,
             plate=data.get('plate', entry.plate),
@@ -115,7 +140,7 @@ def create_app():
 
     @app.route('/schedules', methods=['POST'])
     def create_schedule():
-        data = request.json
+        data = request.get_json() if request.is_json else request.form
         schedule = Schedule(
             scheduled_for=datetime.fromisoformat(data['scheduled_for']),
             plate=data['plate'],
@@ -140,7 +165,7 @@ def create_app():
         schedule = Schedule.query.get_or_404(schedule_id)
         if schedule.status == 'Realizado':
             abort(400, 'Schedule already processed')
-        data = request.json or {}
+        data = request.get_json() if request.is_json else request.form
         entry = Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver).order_by(Entry.timestamp.desc()).first()
         if not entry or entry.exit:
             abort(400, 'No corresponding entry available')

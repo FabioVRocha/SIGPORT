@@ -1,41 +1,61 @@
 # SIGPORT - Sistema Integrado de Gestão de Portaria
 
-Este repositório contém um esqueleto de aplicação web baseada em Flask para o sistema **SIGPORT**. O banco de dados utilizado é PostgreSQL 9.3 e os modelos principais seguem a descrição abaixo:
+![Apresentação](docs/apresentacao.gif)
 
-- **Registro de Entrada** (`Entry`)
-- **Registro de Saída** (`Exit`)
-- **Agendamento de Saída** (`Schedule`)
-- **Usuários** (`User`)
+SIGPORT e um sistema web responsivo para controle de portaria. O sistema foi projetado para uso em dispositivos Android e utiliza um banco de dados PostgreSQL 9.3 instalado localmente. Este reposito rio contem uma implementacao inicial baseada em Flask.
 
-A aplicação disponibiliza endpoints REST para cadastro de usuários, registros de entrada e saída e agendamentos. A criação da saída só é permitida a partir de uma entrada existente e cada entrada pode possuir apenas uma saída.
+## Funcionalidades Principais
 
-## Como executar
+- **Registro de Entrada**: grava data/hora, placa, condutor, passageiros, liberacao, atividade, observacao e fotos.
+- **Registro de Saida**: semelhante ao registro de entrada, atrelado sempre a uma entrada existente.
+- **Agendamento de Saida**: permite registrar previsoes de saida e posteriormente gera-la.
+- **Cadastro de Usuarios**: usuarios podem ser criados, alterados ou removidos via API.
 
-1. Configure a variável `DATABASE_URI` com a string de conexão para o PostgreSQL (exemplo: `postgresql://usuario:senha@localhost/sigport_db`). Caso a senha possua caracteres especiais, utilize percent-encoding.
-2. Instale as dependências:
+As regras de negocio impedem que uma placa saia sem que haja entrada correspondente e que uma mesma entrada gere multiplas saidas.
+
+## Configuracao do Ambiente
+
+1. Defina a variavel `DATABASE_URI` no arquivo `config.py` ou via ambiente. Exemplo:
+   `postgresql://usuario:senha@localhost/sigport_db`
+2. A senha pode conter caracteres especiais. Utilize percent-encoding quando necessario.
+3. Instale as dependencias Python listadas em `requirements.txt`.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Inicie a aplicação:
+## Execucao
+
+Crie as tabelas e inicie o servidor de desenvolvimento:
 
 ```bash
 python app.py
 ```
 
-Por padrão a aplicação executa em `http://localhost:5000`. Ajuste a variável `DATABASE_URI` caso o PostgreSQL esteja em outro host.
+O servidor utiliza a porta `5000` e aceita conexoes de qualquer interface (`0.0.0.0`).
 
-Ao iniciar, a base de dados é criada automaticamente caso não exista.
+## Endpoints Resumidos
 
-## Endpoints principais
+- `POST /users` — cria usuario
+- `GET /users` — lista usuarios
+- `POST /login` — autentica usuario
+- `POST /entries` — registra entrada (uma placa por vez)
+- `GET /entries` — lista entradas
+- `POST /entries/<id>/exit` — registra saida
+- `GET /exits` — lista saidas
+- `POST /schedules` — cria agendamento
+- `GET /schedules` — lista agendamentos
+- `POST /schedules/<id>/create_exit` — gera saida a partir do agendamento
 
-- `POST /users` – cria um usuário
-- `POST /login` – autentica usuário
-- `POST /entries` – registra uma entrada (placa não pode possuir outra entrada aberta)
-- `POST /entries/<id>/exit` – registra a saída a partir de uma entrada
-- `POST /schedules` – cria um agendamento de saída
-- `POST /schedules/<id>/create_exit` – converte agendamento em saída
-- `GET /entries` – lista entradas
-- `GET /exits` – lista saídas
-- `GET /schedules` – lista agendamentos
+Para mais detalhes consulte `app.py` e `models.py`.
+
+## Formulários de Exemplo
+
+O diretório `templates/` contém páginas HTML simples para testar os
+principais recursos via navegador. Acesse `http://localhost:5000/` para a tela de
+login e utilize os demais links diretos para:
+
+- `/users/new` — cadastro de usuário
+- `/entries/new` — registro de entrada
+- `/entries/<id>/exit/new` — registrar saída de uma entrada existente
+- `/schedules/new` — agendar saída
