@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Registrar Entrada{% endblock %}
+{% block content %}
+<form action="/entries" method="post">
+    <label>Placa: <input type="text" name="plate"></label><br>
+    <label>Condutor: <input type="text" name="driver"></label><br>
+    <label>Passageiro: <input type="text" name="passenger"></label><br>
+    <label>Liberação: <input type="text" name="release"></label><br>
+    <label>Atividade: <input type="text" name="activity"></label><br>
+    <label>Observação:<br><textarea name="observation"></textarea></label><br>
+    <button type="submit">Registrar</button>
+</form>
+{% endblock %}

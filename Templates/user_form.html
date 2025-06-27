@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Criar Usuário{% endblock %}
+{% block content %}
+<form action="/users" method="post">
+    <label>CPF: <input type="text" name="cpf"></label><br>
+    <label>Nome: <input type="text" name="name"></label><br>
+    <label>Usuário: <input type="text" name="username"></label><br>
+    <label>Senha: <input type="password" name="password"></label><br>
+    <button type="submit">Salvar</button>
+</form>
+{% endblock %}

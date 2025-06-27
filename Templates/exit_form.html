@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Registrar Saída{% endblock %}
+{% block content %}
+<form action="/entries/{{ entry.id }}/exit" method="post">
+    <p>Placa: {{ entry.plate }}</p>
+    <p>Condutor: {{ entry.driver }}</p>
+    <label>Passageiro: <input type="text" name="passenger" value="{{ entry.passenger }}"></label><br>
+    <label>Liberação: <input type="text" name="release" value="{{ entry.release }}"></label><br>
+    <label>Atividade: <input type="text" name="activity" value="{{ entry.activity }}"></label><br>
+    <label>Observação:<br><textarea name="observation"></textarea></label><br>
+    <button type="submit">Registrar Saída</button>
+</form>
+{% endblock %}

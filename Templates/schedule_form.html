@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Agendar Saída{% endblock %}
+{% block content %}
+<form action="/schedules" method="post">
+    <label>Data/Hora da Previsão: <input type="datetime-local" name="scheduled_for"></label><br>
+    <label>Placa: <input type="text" name="plate"></label><br>
+    <label>Condutor: <input type="text" name="driver"></label><br>
+    <label>Atividade: <input type="text" name="activity"></label><br>
+    <label>Observação:<br><textarea name="observation"></textarea></label><br>
+    <button type="submit">Agendar</button>
+</form>
+{% endblock %}
