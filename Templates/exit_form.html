@@ -1,13 +1,80 @@
-{% extends "base.html" %}
-{% block title %}Registrar Saída{% endblock %}
-{% block content %}
-<form action="/entries/{{ entry.id }}/exit" method="post">
-    <p>Placa: {{ entry.plate }}</p>
-    <p>Condutor: {{ entry.driver }}</p>
-    <label>Passageiro: <input type="text" name="passenger" value="{{ entry.passenger }}"></label><br>
-    <label>Liberação: <input type="text" name="release" value="{{ entry.release }}"></label><br>
-    <label>Atividade: <input type="text" name="activity" value="{{ entry.activity }}"></label><br>
-    <label>Observação:<br><textarea name="observation"></textarea></label><br>
-    <button type="submit">Registrar Saída</button>
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Saída</title>
+    <!-- Carrega o CDN do Tailwind CSS para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte Inter para todo o corpo da página para consistência visual */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<!-- O corpo da página usa flexbox para centralizar o conteúdo vertical e horizontalmente -->
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <!-- Contêiner principal do formulário com fundo branco, cantos arredondados e sombra -->
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
+        <!-- Título do formulário, centralizado, com fonte maior e negrito -->
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Registrar Saída</h1>
+        <!-- Formulário para registro de saída, com espaçamento vertical entre os campos -->
+        <form action="/entries/{{ entry.id }}/exit" method="post" class="space-y-4">
+            <!-- Informações da Placa (não editável, apenas exibição) -->
+            <div>
+                <p class="block text-gray-700 text-sm font-semibold mb-1">Placa:</p>
+                <p class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800 sm:text-sm">
+                    {{ entry.plate }}
+                </p>
+            </div>
+
+            <!-- Informações do Condutor (não editável, apenas exibição) -->
+            <div>
+                <p class="block text-gray-700 text-sm font-semibold mb-1">Condutor:</p>
+                <p class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-800 sm:text-sm">
+                    {{ entry.driver }}
+                </p>
+            </div>
+
+            <!-- Campo para o Passageiro, com valor pré-preenchido -->
+            <div>
+                <label for="passenger" class="block text-gray-700 text-sm font-semibold mb-1">Passageiro:</label>
+                <input type="text" id="passenger" name="passenger" value="{{ entry.passenger }}"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       placeholder="Nome do Passageiro (opcional)">
+            </div>
+
+            <!-- Campo para o número de Liberação, com valor pré-preenchido -->
+            <div>
+                <label for="release" class="block text-gray-700 text-sm font-semibold mb-1">Liberação:</label>
+                <input type="text" id="release" name="release" value="{{ entry.release }}" required
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       placeholder="Número da Liberação">
+            </div>
+
+            <!-- Campo para o tipo de Atividade, com valor pré-preenchido -->
+            <div>
+                <label for="activity" class="block text-gray-700 text-sm font-semibold mb-1">Atividade:</label>
+                <input type="text" id="activity" name="activity" value="{{ entry.activity }}" required
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       placeholder="Tipo de Atividade">
+            </div>
+
+            <!-- Campo de texto para Observações adicionais -->
+            <div>
+                <label for="observation" class="block text-gray-700 text-sm font-semibold mb-1">Observação:</label>
+                <textarea id="observation" name="observation" rows="3"
+                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                          placeholder="Adicione qualquer observação aqui..."></textarea>
+            </div>
+
+            <!-- Botão de submissão do formulário, com estilo completo do Tailwind -->
+            <button type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                Registrar Saída
+            </button>
+        </form>
+    </div>
+</body>
+</html>

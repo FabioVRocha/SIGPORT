@@ -1,11 +1,21 @@
-<!doctype html>
-<html lang="pt-br">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <meta charset="utf-8">
-    <title>SIGPORT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SIGPORT{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte Inter para todo o corpo da página */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body>
-    <h1>{% block title %}{% endblock %}</h1>
-    {% block content %}{% endblock %}
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <!-- O conteúdo específico de cada página será inserido aqui -->
+    {% block content %}
+    {% endblock %}
 </body>
 </html>
