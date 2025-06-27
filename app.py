@@ -24,6 +24,11 @@ def create_app():
         db.session.commit()
         return jsonify({'id': user.id}), 201
 
+    @app.route('/users', methods=['GET'])
+    def list_users():
+        users = User.query.all()
+        return jsonify([{'id': u.id, 'cpf': u.cpf, 'name': u.name, 'username': u.username} for u in users])
+
     @app.route('/login', methods=['POST'])
     def login():
         data = request.json
@@ -35,6 +40,15 @@ def create_app():
     @app.route('/entries', methods=['POST'])
     def create_entry():
         data = request.json
+        # check if plate already inside
+        open_entry = (
+            Entry.query.filter_by(plate=data['plate'])
+            .outerjoin(Exit)
+            .filter(Exit.id.is_(None))
+            .first()
+        )
+        if open_entry:
+            abort(400, 'Plate already has an open entry')
         entry = Entry(
             plate=data['plate'],
             driver=data['driver'],
@@ -50,6 +64,23 @@ def create_app():
         db.session.add(entry)
         db.session.commit()
         return jsonify({'id': entry.id}), 201
+
+    @app.route('/entries', methods=['GET'])
+    def list_entries():
+        entries = Entry.query.all()
+        result = []
+        for e in entries:
+            result.append({'id': e.id, 'timestamp': e.timestamp.isoformat(), 'plate': e.plate, 'driver': e.driver})
+        return jsonify(result)
+
+    @app.route('/entries/<int:entry_id>', methods=['DELETE'])
+    def delete_entry(entry_id):
+        entry = Entry.query.get_or_404(entry_id)
+        if entry.exit:
+            abort(400, 'Cannot delete entry with exit')
+        db.session.delete(entry)
+        db.session.commit()
+        return '', 204
 
     @app.route('/entries/<int:entry_id>/exit', methods=['POST'])
     def create_exit(entry_id):
@@ -74,6 +105,14 @@ def create_app():
         db.session.commit()
         return jsonify({'id': exit_record.id}), 201
 
+    @app.route('/exits', methods=['GET'])
+    def list_exits():
+        exits = Exit.query.all()
+        result = []
+        for ex in exits:
+            result.append({'id': ex.id, 'timestamp': ex.timestamp.isoformat(), 'plate': ex.plate, 'driver': ex.driver})
+        return jsonify(result)
+
     @app.route('/schedules', methods=['POST'])
     def create_schedule():
         data = request.json
@@ -87,6 +126,14 @@ def create_app():
         db.session.add(schedule)
         db.session.commit()
         return jsonify({'id': schedule.id}), 201
+
+    @app.route('/schedules', methods=['GET'])
+    def list_schedules():
+        schedules = Schedule.query.all()
+        result = []
+        for s in schedules:
+            result.append({'id': s.id, 'scheduled_for': s.scheduled_for.isoformat(), 'plate': s.plate, 'driver': s.driver, 'status': s.status})
+        return jsonify(result)
 
     @app.route('/schedules/<int:schedule_id>/create_exit', methods=['POST'])
     def schedule_to_exit(schedule_id):
@@ -122,4 +169,4 @@ if __name__ == '__main__':
     app = create_app()
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

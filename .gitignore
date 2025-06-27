@@ -4,3 +4,4 @@
 /doc_text.txt
 __pycache__/
 *.pyc
+*.docx

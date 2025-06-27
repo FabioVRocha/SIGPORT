@@ -7,11 +7,11 @@ Este repositório contém um esqueleto de aplicação web baseada em Flask para 
 - **Agendamento de Saída** (`Schedule`)
 - **Usuários** (`User`)
 
-A aplicação disponibiliza endpoints REST simples para criação de usuários, registros de entrada/saída e agendamentos.
+A aplicação disponibiliza endpoints REST para cadastro de usuários, registros de entrada e saída e agendamentos. A criação da saída só é permitida a partir de uma entrada existente e cada entrada pode possuir apenas uma saída.
 
 ## Como executar
 
-1. Configure a variável `DATABASE_URI` com a string de conexão para o PostgreSQL (exemplo: `postgresql://user:password@localhost/sigport_db`).
+1. Configure a variável `DATABASE_URI` com a string de conexão para o PostgreSQL (exemplo: `postgresql://usuario:senha@localhost/sigport_db`). Caso a senha possua caracteres especiais, utilize percent-encoding.
 2. Instale as dependências:
 
 ```bash
@@ -24,4 +24,18 @@ pip install -r requirements.txt
 python app.py
 ```
 
+Por padrão a aplicação executa em `http://localhost:5000`. Ajuste a variável `DATABASE_URI` caso o PostgreSQL esteja em outro host.
+
 Ao iniciar, a base de dados é criada automaticamente caso não exista.
+
+## Endpoints principais
+
+- `POST /users` – cria um usuário
+- `POST /login` – autentica usuário
+- `POST /entries` – registra uma entrada (placa não pode possuir outra entrada aberta)
+- `POST /entries/<id>/exit` – registra a saída a partir de uma entrada
+- `POST /schedules` – cria um agendamento de saída
+- `POST /schedules/<id>/create_exit` – converte agendamento em saída
+- `GET /entries` – lista entradas
+- `GET /exits` – lista saídas
+- `GET /schedules` – lista agendamentos
