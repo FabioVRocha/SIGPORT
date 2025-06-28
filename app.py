@@ -204,16 +204,16 @@ def create_app():
         if schedule.status == 'Realizado':
             abort(400, 'Schedule already processed')
         data = request.get_json() if request.is_json else request.form
-        entry = (
-            Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver)
-            .outerjoin(Exit)
-            .filter(Exit.id.is_(None))
-            .order_by(Entry.timestamp.desc())
-            .first()
-        )
-        if not entry:
-            entry = Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver).filter(Entry.exit == None).order_by(Entry.timestamp.desc()).first()
-        if not entry or entry.exit:
+        entry = schedule.entry
+        if entry is None or entry.exit:
+            entry = (
+                Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver)
+                .outerjoin(Exit)
+                .filter(Exit.id.is_(None))
+                .order_by(Entry.timestamp.desc())
+                .first()
+            )
+        if not entry:            
             abort(400, 'No corresponding entry available')
         exit_record = Exit(
             entry=entry,
