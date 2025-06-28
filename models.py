@@ -13,6 +13,9 @@ class User(db.Model):
     name = db.Column(db.String(120), nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+    type = db.Column(db.String(20), nullable=False, server_default='Usuário')
+
+    permissions = db.relationship('Permission', back_populates='user', cascade='all, delete-orphan')
 
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
@@ -73,3 +76,13 @@ class Schedule(db.Model):
     observation = db.Column(db.Text)
     entry_id = db.Column(db.Integer, db.ForeignKey('entries.id'))
     entry = db.relationship('Entry')
+
+
+class Permission(db.Model):
+    __tablename__ = 'permissions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    routine = db.Column(db.String(50), nullable=False)
+
+    user = db.relationship('User', back_populates='permissions')

@@ -23,12 +23,14 @@
                 </svg>
                 <span class="mt-4 text-md font-semibold text-gray-800 group-hover:text-purple-800 transition duration-200 ease-in-out">Usuário</span>
             </a>
+            {% if is_admin %}
             <a href="/access_control" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-yellow-50 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 ease-in-out group">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-yellow-600 group-hover:text-yellow-700 transition duration-200 ease-in-out">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6a4.5 4.5 0 10-9 0v4.5m-3 0h15m-1.5 0v7.5a3 3 0 01-3 3h-6a3 3 0 01-3-3v-7.5h12z" />
                 </svg>
                 <span class="mt-4 text-md font-semibold text-gray-800 group-hover:text-yellow-800 transition duration-200 ease-in-out">Controle de Acesso</span>
             </a>
+            {% endif %}
         </div>
     </div>
 </body>

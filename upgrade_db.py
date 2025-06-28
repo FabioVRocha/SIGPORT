@@ -12,7 +12,9 @@ ALTER_STATEMENTS = [
     "ALTER TABLE exits ALTER COLUMN photo_driver TYPE TEXT",
     "ALTER TABLE exits ALTER COLUMN photo_content TYPE TEXT",
     "ALTER TABLE exits ALTER COLUMN photo_document TYPE TEXT",
-    "ALTER TABLE schedules ADD COLUMN IF NOT EXISTS entry_id INTEGER REFERENCES entries(id)"
+    "ALTER TABLE schedules ADD COLUMN IF NOT EXISTS entry_id INTEGER REFERENCES entries(id)",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS type VARCHAR(20) NOT NULL DEFAULT 'Usuário'",
+    "CREATE TABLE IF NOT EXISTS permissions (id SERIAL PRIMARY KEY, user_id INTEGER REFERENCES users(id) ON DELETE CASCADE, routine VARCHAR(50) NOT NULL)"
 ]
 
 def upgrade():

@@ -12,10 +12,29 @@
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md text-center space-y-4">
-        <h1 class="text-2xl font-bold text-gray-800">Controle de Acesso</h1>
-        <p class="text-gray-600">Defina o que cada usuário pode acessar no sistema.</p>
-        <p class="text-gray-500">Funcionalidade em desenvolvimento.</p>
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-4">
+        <h1 class="text-2xl font-bold text-gray-800 text-center">Controle de Acesso</h1>
+        <form method="post" class="space-y-4">
+            <div>
+                <label for="user_id" class="block text-gray-700 text-sm font-semibold mb-1">Usuário:</label>
+                <select id="user_id" name="user_id" onchange="this.form.submit()" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    {% for u in users %}
+                    <option value="{{ u.id }}" {% if u.id == selected_id %}selected{% endif %}>{{ u.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="space-y-2">
+                {% for key, label in routines.items() %}
+                <div class="flex items-center">
+                    <input type="checkbox" id="perm_{{ key }}" name="permissions" value="{{ key }}" class="mr-2" {% if key in user_perms %}checked{% endif %}>
+                    <label for="perm_{{ key }}" class="text-gray-700 text-sm">{{ label }}</label>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center">
+                <button type="submit" class="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700">Salvar</button>
+            </div>
+        </form>
     </div>
 </body>
 </html>

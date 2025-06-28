@@ -8,10 +8,12 @@ from flask import (
     render_template,
     redirect,
     url_for,
+    session,
 )
 
 from config import DATABASE_URI, SECRET_KEY
-from models import db, User, Entry, Exit, Schedule
+from models import db, User, Entry, Exit, Schedule, Permission
+from functools import wraps
 
 
 def normalize_plate(plate: str) -> str:
@@ -45,44 +47,102 @@ def create_app():
     app.config['SECRET_KEY'] = SECRET_KEY
     db.init_app(app)
 
+    ROUTINE_LABELS = {
+        'entries': 'Entrada',
+        'exits': 'Saída',
+        'schedules': 'Agendar Saída',
+        'cadastro': 'Cadastro',
+        'access_control': 'Controle de Acesso',
+    }
+
+    def login_required(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if 'user_id' not in session:
+                return redirect(url_for('login_form'))
+            return f(*args, **kwargs)
+        return wrapper
+
+    def permission_required(routine):
+        def decorator(f):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                if session.get('user_type') == 'Administrador':
+                    return f(*args, **kwargs)
+                if routine not in session.get('permissions', []):
+                    abort(403)
+                return f(*args, **kwargs)
+            return wrapper
+        return decorator
+
     @app.route('/')
     def index():
         return redirect(url_for('login_form'))
 
     @app.route('/index')
+    @login_required
     def main_menu():
-        return render_template('index.html')
+        perms = session.get('permissions', [])
+        return render_template('index.html', permissions=perms, is_admin=session.get('user_type') == 'Administrador')
 
     @app.route('/cadastro')
+    @login_required
+    @permission_required('cadastro')
     def cadastro_menu():
-        return render_template('cadastro.html')
+        return render_template('cadastro.html', is_admin=session.get('user_type') == 'Administrador')
 
-    @app.route('/access_control')
+    @app.route('/access_control', methods=['GET', 'POST'])
+    @login_required
     def access_control_menu():
-        return render_template('access_control.html')
+        if session.get('user_type') != 'Administrador':
+            abort(403)
+        if request.method == 'POST':
+            user_id = int(request.form['user_id'])
+            selected = request.form.getlist('permissions')
+            Permission.query.filter_by(user_id=user_id).delete()
+            for perm in selected:
+                db.session.add(Permission(user_id=user_id, routine=perm))
+            db.session.commit()
+            return redirect(url_for('access_control_menu', user_id=user_id))
+        users = User.query.all()
+        selected_id = request.args.get('user_id', type=int)
+        if not selected_id and users:
+            selected_id = users[0].id
+        perms = set(p.routine for p in Permission.query.filter_by(user_id=selected_id))
+        return render_template('access_control.html', users=users, selected_id=selected_id, user_perms=perms, routines=ROUTINE_LABELS)
 
     @app.route('/login', methods=['GET'])
     def login_form():
         return render_template('login.html')
 
     @app.route('/users/new')
+    @login_required
+    @permission_required('cadastro')
     def user_form():
         return render_template('user_form.html')
 
     @app.route('/entries/new')
+    @login_required
+    @permission_required('entries')
     def entry_form():
         return render_template('entry_form.html')
 
     @app.route('/entries/list')
+    @login_required
+    @permission_required('entries')
     def entries_list_page():
         entries = Entry.query.order_by(Entry.timestamp.desc()).all()
         return render_template('entries_list.html', entries=entries)
 
     @app.route('/exits/new')
+    @login_required
+    @permission_required('exits')
     def exit_lookup():
         return render_template('exit_lookup.html')
 
     @app.route('/exits/list')
+    @login_required
+    @permission_required('exits')
     def exits_list_page():
         exits = Exit.query.order_by(Exit.timestamp.desc()).all()
         schedules = Schedule.query.order_by(Schedule.scheduled_for.asc()).all()
@@ -103,15 +163,21 @@ def create_app():
         )
 
     @app.route('/entries/<int:entry_id>/exit/new')
+    @login_required
+    @permission_required('exits')
     def exit_form(entry_id):
         entry = Entry.query.get_or_404(entry_id)
         return render_template('exit_form.html', entry=entry)
 
     @app.route('/schedules/new')
+    @login_required
+    @permission_required('schedules')
     def schedule_form():
         return render_template('schedule_form.html')
 
     @app.route('/schedules/<int:schedule_id>/exit/new')
+    @login_required
+    @permission_required('schedules')
     def schedule_exit_form(schedule_id):
         schedule = Schedule.query.get_or_404(schedule_id)
         # locate a related open entry to avoid submitting the form when none exists
@@ -123,11 +189,13 @@ def create_app():
         return render_template('schedule_exit_form.html', schedule=schedule)
 
     @app.route('/users', methods=['POST'])
+    @login_required
+    @permission_required('cadastro')
     def create_user():
         data = request.get_json() if request.is_json else request.form
         if not data:
             abort(400, 'Missing payload')
-        user = User(cpf=data['cpf'], name=data['name'], username=data['username'])
+        user = User(cpf=data['cpf'], name=data['name'], username=data['username'], type=data.get('type', 'Usuário'))
         user.set_password(data['password'])
         db.session.add(user)
         db.session.commit()
@@ -143,12 +211,17 @@ def create_app():
         data = request.get_json() if request.is_json else request.form
         user = User.query.filter_by(username=data['username']).first()
         if user and user.check_password(data['password']):
+            session['user_id'] = user.id
+            session['user_type'] = user.type
+            session['permissions'] = [p.routine for p in user.permissions]
             if request.is_json:
                 return jsonify({'message': 'login ok'})
             return redirect(url_for('main_menu'))
         abort(401, 'Invalid credentials')
 
     @app.route('/entries', methods=['POST'])
+    @login_required
+    @permission_required('entries')
     def create_entry():
         data = request.get_json() if request.is_json else request.form
         # check if plate already inside
@@ -192,6 +265,8 @@ def create_app():
         return jsonify(result)
 
     @app.route('/entries/<int:entry_id>', methods=['DELETE'])
+    @login_required
+    @permission_required('entries')
     def delete_entry(entry_id):
         entry = Entry.query.get_or_404(entry_id)
         if entry.exit:
@@ -201,6 +276,8 @@ def create_app():
         return '', 204
 
     @app.route('/entries/<int:entry_id>/exit', methods=['POST'])
+    @login_required
+    @permission_required('exits')
     def create_exit(entry_id):
         entry = Entry.query.get_or_404(entry_id)
         if entry.exit:
@@ -232,6 +309,8 @@ def create_app():
         return jsonify(result)
 
     @app.route('/schedules', methods=['POST'])
+    @login_required
+    @permission_required('schedules')
     def create_schedule():
         data = request.get_json() if request.is_json else request.form
         schedule = Schedule(
@@ -273,6 +352,8 @@ def create_app():
         return jsonify(result)
 
     @app.route('/schedules/<int:schedule_id>/create_exit', methods=['POST'])
+    @login_required
+    @permission_required('exits')
     def schedule_to_exit(schedule_id):
         schedule = Schedule.query.get_or_404(schedule_id)
         if schedule.status == 'Realizado':
