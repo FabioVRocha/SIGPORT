@@ -24,6 +24,10 @@ As regras de negocio impedem que uma placa saia sem que haja entrada corresponde
 pip install -r requirements.txt
 ```
 
+Se atualizar os modelos ou clonar o repositório depois de já possuir tabelas
+criadas, execute `upgrade_db.py` para ajustar os tipos de coluna das fotos para
+`TEXT`. Isso evita erros de truncamento ao salvar imagens grandes.
+
 ## Execucao
 
 Crie as tabelas e inicie o servidor de desenvolvimento:

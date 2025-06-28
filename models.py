@@ -32,10 +32,10 @@ class Entry(db.Model):
     release = db.Column(db.String(120), nullable=False)
     activity = db.Column(db.String(120), nullable=False)
     observation = db.Column(db.Text, nullable=False)
-    photo_plate = db.Column(db.String(200), nullable=False)
-    photo_driver = db.Column(db.String(200), nullable=False)
-    photo_content = db.Column(db.String(200))
-    photo_document = db.Column(db.String(200))
+    photo_plate = db.Column(db.Text, nullable=False)
+    photo_driver = db.Column(db.Text, nullable=False)
+    photo_content = db.Column(db.Text)
+    photo_document = db.Column(db.Text)
 
     exit = db.relationship('Exit', uselist=False, back_populates='entry')
 
@@ -52,10 +52,10 @@ class Exit(db.Model):
     release = db.Column(db.String(120))
     activity = db.Column(db.String(120))
     observation = db.Column(db.Text)
-    photo_plate = db.Column(db.String(200))
-    photo_driver = db.Column(db.String(200))
-    photo_content = db.Column(db.String(200))
-    photo_document = db.Column(db.String(200))
+    photo_plate = db.Column(db.Text)
+    photo_driver = db.Column(db.Text)
+    photo_content = db.Column(db.Text)
+    photo_document = db.Column(db.Text)
 
     entry = db.relationship('Entry', back_populates='exit')
 
