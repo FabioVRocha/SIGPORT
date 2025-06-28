@@ -60,6 +60,18 @@ def create_app():
     @app.route('/schedules/<int:schedule_id>/exit/new')
     def schedule_exit_form(schedule_id):
         schedule = Schedule.query.get_or_404(schedule_id)
+        # locate a related open entry to avoid submitting the form when none exists
+        entry = schedule.entry
+        if entry is None or entry.exit:
+            entry = (
+                Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver)
+                .outerjoin(Exit)
+                .filter(Exit.id.is_(None))
+                .order_by(Entry.timestamp.desc())
+                .first()
+            )
+        if not entry:
+            abort(400, "No corresponding entry available")
         return render_template('schedule_exit_form.html', schedule=schedule)
 
     @app.route('/users', methods=['POST'])
@@ -181,7 +193,13 @@ def create_app():
             activity=data.get('activity'),
             observation=data.get('observation'),
         )
-        open_entry = Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver).filter(Entry.exit == None).order_by(Entry.timestamp.desc()).first()
+        open_entry = (
+            Entry.query.filter_by(plate=schedule.plate)
+            .outerjoin(Exit)
+            .filter(Exit.id.is_(None))
+            .order_by(Entry.timestamp.desc())
+            .first()
+        )
         if open_entry:
             schedule.entry = open_entry
         db.session.add(schedule)
@@ -207,7 +225,7 @@ def create_app():
         entry = schedule.entry
         if entry is None or entry.exit:
             entry = (
-                Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver)
+                Entry.query.filter_by(plate=schedule.plate)
                 .outerjoin(Exit)
                 .filter(Exit.id.is_(None))
                 .order_by(Entry.timestamp.desc())
