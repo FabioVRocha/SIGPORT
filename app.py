@@ -63,8 +63,12 @@ def create_app():
         # locate a related open entry to avoid submitting the form when none exists
         entry = schedule.entry
         if entry is None or entry.exit:
+            plate_norm = schedule.plate.replace('-', '').upper()
             entry = (
-                Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver)
+                Entry.query.filter(
+                    db.func.replace(db.func.upper(Entry.plate), '-', '')
+                    == plate_norm
+                )
                 .outerjoin(Exit)
                 .filter(Exit.id.is_(None))
                 .order_by(Entry.timestamp.desc())
@@ -193,8 +197,11 @@ def create_app():
             activity=data.get('activity'),
             observation=data.get('observation'),
         )
+        plate_norm = schedule.plate.replace('-', '').upper()
         open_entry = (
-            Entry.query.filter_by(plate=schedule.plate)
+            Entry.query.filter(
+                db.func.replace(db.func.upper(Entry.plate), '-', '') == plate_norm
+            )
             .outerjoin(Exit)
             .filter(Exit.id.is_(None))
             .order_by(Entry.timestamp.desc())
@@ -224,8 +231,12 @@ def create_app():
         data = request.get_json() if request.is_json else request.form
         entry = schedule.entry
         if entry is None or entry.exit:
+            plate_norm = schedule.plate.replace('-', '').upper()
             entry = (
-                Entry.query.filter_by(plate=schedule.plate)
+                Entry.query.filter(
+                    db.func.replace(db.func.upper(Entry.plate), '-', '')
+                    == plate_norm
+                )
                 .outerjoin(Exit)
                 .filter(Exit.id.is_(None))
                 .order_by(Entry.timestamp.desc())
