@@ -33,6 +33,11 @@ def create_app():
     def entry_form():
         return render_template('entry_form.html')
 
+    @app.route('/entries/list')
+    def entries_list_page():
+        entries = Entry.query.order_by(Entry.timestamp.desc()).all()
+        return render_template('entries_list.html', entries=entries)
+
     @app.route('/exits/new')
     def exit_lookup():
         return render_template('exit_lookup.html')
