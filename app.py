@@ -42,6 +42,11 @@ def create_app():
     def exit_lookup():
         return render_template('exit_lookup.html')
 
+    @app.route('/exits/list')
+    def exits_list_page():
+        exits = Exit.query.order_by(Exit.timestamp.desc()).all()
+        return render_template('exit_list.html', exits=exits)
+
     @app.route('/entries/<int:entry_id>/exit/new')
     def exit_form(entry_id):
         entry = Entry.query.get_or_404(entry_id)
