@@ -53,6 +53,14 @@ def create_app():
     def main_menu():
         return render_template('index.html')
 
+    @app.route('/cadastro')
+    def cadastro_menu():
+        return render_template('cadastro.html')
+
+    @app.route('/access_control')
+    def access_control_menu():
+        return render_template('access_control.html')
+
     @app.route('/login', methods=['GET'])
     def login_form():
         return render_template('login.html')
