@@ -41,26 +41,27 @@
 
     <!-- Lista vertical de cards -->
     <div class="space-y-4">
-      <!-- Exemplo de dados de entrada -->
+      {% for e in entries %}
       <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
         <div class="flex justify-between items-center mb-2">
           <span class="text-gray-500 text-sm">ID</span>
-          <span class="font-medium text-gray-900">E001</span>
+          <span class="font-medium text-gray-900">{{ e.id }}</span>
         </div>
         <div class="flex justify-between items-center mb-2">
           <span class="text-gray-500 text-sm">Data/Hora</span>
-          <span class="text-gray-800 text-sm">28/06/2025 09:00</span>
+          <span class="text-gray-800 text-sm">{{ e.timestamp.strftime('%d/%m/%Y %H:%M') }}</span>
         </div>
         <div class="flex justify-between items-center mb-2">
           <span class="text-gray-500 text-sm">Placa</span>
-          <span class="text-gray-800 text-sm">DEF-5678</span>
+          <span class="text-gray-800 text-sm">{{ e.plate }}</span>
         </div>
         <div class="flex justify-between items-center mb-3">
           <span class="text-gray-500 text-sm">Condutor</span>
-          <span class="text-gray-800 text-sm">Ana Costa</span>
+          <span class="text-gray-800 text-sm">{{ e.driver }}</span>
         </div>
         <div class="text-right">
-          <a href="/entries/E001/exit/new"
+          {% if not e.exit %}
+          <a href="/entries/{{ e.id }}/exit/new"
              class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
             <!-- Icone: Seta para cima -->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-1">
@@ -68,70 +69,14 @@
             </svg>
             Registrar Saída
           </a>
+          {% else %}
+          <span class="text-gray-500 text-xs">Saída registrada</span>
+          {% endif %}
         </div>
       </div>
-
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-500 text-sm">ID</span>
-          <span class="font-medium text-gray-900">E002</span>
-        </div>
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-500 text-sm">Data/Hora</span>
-          <span class="text-gray-800 text-sm">27/06/2025 14:00</span>
-        </div>
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-500 text-sm">Placa</span>
-          <span class="text-gray-800 text-sm">GHI-9012</span>
-        </div>
-        <div class="flex justify-between items-center mb-3">
-          <span class="text-gray-500 text-sm">Condutor</span>
-          <span class="text-gray-800 text-sm">Bruno Lima</span>
-        </div>
-        <div class="text-right">
-          <a href="/entries/E002/exit/new"
-             class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
-            <!-- Icone: Seta para cima -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-1">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
-            </svg>
-            Registrar Saída
-          </a>
-        </div>
-      </div>
-
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-500 text-sm">ID</span>
-          <span class="font-medium text-gray-900">E003</span>
-        </div>
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-500 text-sm">Data/Hora</span>
-          <span class="text-gray-800 text-sm">26/06/2025 11:15</span>
-        </div>
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-500 text-sm">Placa</span>
-          <span class="text-gray-800 text-sm">MNO-3456</span>
-        </div>
-        <div class="flex justify-between items-center mb-3">
-          <span class="text-gray-500 text-sm">Condutor</span>
-          <span class="text-gray-800 text-sm">Mariana Rocha</span>
-        </div>
-        <div class="text-right">
-          <a href="/entries/E003/exit/new"
-             class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-full text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
-            <!-- Icone: Seta para cima -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-1">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
-            </svg>
-            Registrar Saída
-          </a>
-        </div>
-      </div>
-      <!-- Fim dos exemplos de dados de entrada -->
-
-      <!-- Se não houver entradas registradas (para fins de demonstração, isso não será exibido com os dados de exemplo acima) -->
-      <!-- <p class="text-center text-gray-500">Nenhuma entrada registrada.</p> -->
+      {% else %}
+      <p class="text-center text-gray-500">Nenhuma entrada registrada.</p>
+      {% endfor %}
     </div>
   </div>
 </body>

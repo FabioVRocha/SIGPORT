@@ -113,7 +113,9 @@ def create_app():
         )
         db.session.add(entry)
         db.session.commit()
-        return jsonify({'id': entry.id}), 201
+        if request.is_json:
+            return jsonify({'id': entry.id}), 201
+        return redirect(url_for('entries_list_page'))
 
     @app.route('/entries', methods=['GET'])
     def list_entries():
