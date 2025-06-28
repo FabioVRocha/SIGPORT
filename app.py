@@ -19,6 +19,25 @@ def normalize_plate(plate: str) -> str:
     return plate.replace("-", "").replace(" ", "").upper()
 
 
+def find_open_entry(plate: str):
+    """Return the most recent open entry for the given plate or None."""
+    plate_norm = normalize_plate(plate)
+    return (
+        Entry.query.filter(
+            db.func.replace(
+                db.func.replace(db.func.upper(Entry.plate), '-', ''),
+                ' ',
+                '',
+            )
+            == plate_norm
+        )
+        .outerjoin(Exit)
+        .filter(Exit.id.is_(None))
+        .order_by(Entry.timestamp.desc())
+        .first()
+    )
+
+
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
@@ -59,7 +78,21 @@ def create_app():
     def exits_list_page():
         exits = Exit.query.order_by(Exit.timestamp.desc()).all()
         schedules = Schedule.query.order_by(Schedule.scheduled_for.asc()).all()
-        return render_template('exit_list.html', exits=exits, schedules=schedules)
+        open_for_schedule = {}
+        for s in schedules:
+            if s.status == 'Pendente':
+                entry = s.entry
+                if entry is None or entry.exit:
+                    entry = find_open_entry(s.plate)
+                open_for_schedule[s.id] = entry is not None
+            else:
+                open_for_schedule[s.id] = False
+        return render_template(
+            'exit_list.html',
+            exits=exits,
+            schedules=schedules,
+            open_for_schedule=open_for_schedule,
+        )
 
     @app.route('/entries/<int:entry_id>/exit/new')
     def exit_form(entry_id):
@@ -76,21 +109,7 @@ def create_app():
         # locate a related open entry to avoid submitting the form when none exists
         entry = schedule.entry
         if entry is None or entry.exit:
-            plate_norm = normalize_plate(schedule.plate)
-            entry = (
-                Entry.query.filter(
-                    db.func.replace(
-                        db.func.replace(db.func.upper(Entry.plate), '-', ''),
-                        ' ',
-                        '',
-                    )
-                    == plate_norm
-                )
-                .outerjoin(Exit)
-                .filter(Exit.id.is_(None))
-                .order_by(Entry.timestamp.desc())
-                .first()
-            )
+            entry = find_open_entry(schedule.plate)
         if not entry:
             abort(400, "No corresponding entry available")
         return render_template('schedule_exit_form.html', schedule=schedule)
@@ -253,21 +272,7 @@ def create_app():
         data = request.get_json() if request.is_json else request.form
         entry = schedule.entry
         if entry is None or entry.exit:
-            plate_norm = normalize_plate(schedule.plate)
-            entry = (
-                Entry.query.filter(
-                    db.func.replace(
-                        db.func.replace(db.func.upper(Entry.plate), '-', ''),
-                        ' ',
-                        '',
-                    )
-                    == plate_norm
-                )
-                .outerjoin(Exit)
-                .filter(Exit.id.is_(None))
-                .order_by(Entry.timestamp.desc())
-                .first()
-            )
+            entry = find_open_entry(schedule.plate)
         if not entry:            
             abort(400, 'No corresponding entry available')
         exit_record = Exit(
