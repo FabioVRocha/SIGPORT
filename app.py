@@ -33,6 +33,10 @@ def create_app():
     def entry_form():
         return render_template('entry_form.html')
 
+    @app.route('/exits/new')
+    def exit_lookup():
+        return render_template('exit_lookup.html')
+
     @app.route('/entries/<int:entry_id>/exit/new')
     def exit_form(entry_id):
         entry = Entry.query.get_or_404(entry_id)
