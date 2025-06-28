@@ -45,7 +45,8 @@ def create_app():
     @app.route('/exits/list')
     def exits_list_page():
         exits = Exit.query.order_by(Exit.timestamp.desc()).all()
-        return render_template('exit_list.html', exits=exits)
+        schedules = Schedule.query.order_by(Schedule.scheduled_for.asc()).all()
+        return render_template('exit_list.html', exits=exits, schedules=schedules)
 
     @app.route('/entries/<int:entry_id>/exit/new')
     def exit_form(entry_id):
@@ -55,6 +56,11 @@ def create_app():
     @app.route('/schedules/new')
     def schedule_form():
         return render_template('schedule_form.html')
+
+    @app.route('/schedules/<int:schedule_id>/exit/new')
+    def schedule_exit_form(schedule_id):
+        schedule = Schedule.query.get_or_404(schedule_id)
+        return render_template('schedule_exit_form.html', schedule=schedule)
 
     @app.route('/users', methods=['POST'])
     def create_user():
@@ -175,9 +181,14 @@ def create_app():
             activity=data.get('activity'),
             observation=data.get('observation'),
         )
+        open_entry = Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver).filter(Entry.exit == None).order_by(Entry.timestamp.desc()).first()
+        if open_entry:
+            schedule.entry = open_entry
         db.session.add(schedule)
         db.session.commit()
-        return jsonify({'id': schedule.id}), 201
+        if request.is_json:
+            return jsonify({'id': schedule.id}), 201
+        return redirect(url_for('exits_list_page'))
 
     @app.route('/schedules', methods=['GET'])
     def list_schedules():
@@ -193,7 +204,15 @@ def create_app():
         if schedule.status == 'Realizado':
             abort(400, 'Schedule already processed')
         data = request.get_json() if request.is_json else request.form
-        entry = Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver).order_by(Entry.timestamp.desc()).first()
+        entry = (
+            Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver)
+            .outerjoin(Exit)
+            .filter(Exit.id.is_(None))
+            .order_by(Entry.timestamp.desc())
+            .first()
+        )
+        if not entry:
+            entry = Entry.query.filter_by(plate=schedule.plate, driver=schedule.driver).filter(Entry.exit == None).order_by(Entry.timestamp.desc()).first()
         if not entry or entry.exit:
             abort(400, 'No corresponding entry available')
         exit_record = Exit(
@@ -212,7 +231,9 @@ def create_app():
         db.session.add(exit_record)
         schedule.status = 'Realizado'
         db.session.commit()
-        return jsonify({'exit_id': exit_record.id}), 201
+        if request.is_json:
+            return jsonify({'exit_id': exit_record.id}), 201
+        return redirect(url_for('exits_list_page'))
 
     return app
 

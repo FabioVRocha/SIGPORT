@@ -12,6 +12,7 @@ ALTER_STATEMENTS = [
     "ALTER TABLE exits ALTER COLUMN photo_driver TYPE TEXT",
     "ALTER TABLE exits ALTER COLUMN photo_content TYPE TEXT",
     "ALTER TABLE exits ALTER COLUMN photo_document TYPE TEXT",
+    "ALTER TABLE schedules ADD COLUMN IF NOT EXISTS entry_id INTEGER REFERENCES entries(id)"
 ]
 
 def upgrade():

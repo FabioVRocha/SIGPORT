@@ -71,3 +71,5 @@ class Schedule(db.Model):
     activity = db.Column(db.String(120))
     status = db.Column(db.String(20), default='Pendente', nullable=False)
     observation = db.Column(db.Text)
+    entry_id = db.Column(db.Integer, db.ForeignKey('entries.id'))
+    entry = db.relationship('Entry')

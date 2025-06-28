@@ -50,6 +50,7 @@ O servidor utiliza a porta `5000` e aceita conexoes de qualquer interface (`0.0.
 - `POST /schedules` — cria agendamento
 - `GET /schedules` — lista agendamentos
 - `POST /schedules/<id>/create_exit` — gera saida a partir do agendamento
+- `GET /schedules/<id>/exit/new` — formulário para registrar saida agendada
 
 Para mais detalhes consulte `app.py` e `models.py`.
 
