@@ -1,9 +1,22 @@
 from datetime import datetime
 
-from flask import Flask, jsonify, request, abort, render_template, redirect, url_for
+from flask import (
+    Flask,
+    jsonify,
+    request,
+    abort,
+    render_template,
+    redirect,
+    url_for,
+)
 
 from config import DATABASE_URI, SECRET_KEY
 from models import db, User, Entry, Exit, Schedule
+
+
+def normalize_plate(plate: str) -> str:
+    """Return the plate in uppercase without dashes or spaces."""
+    return plate.replace("-", "").replace(" ", "").upper()
 
 
 def create_app():
@@ -63,10 +76,14 @@ def create_app():
         # locate a related open entry to avoid submitting the form when none exists
         entry = schedule.entry
         if entry is None or entry.exit:
-            plate_norm = schedule.plate.replace('-', '').upper()
+            plate_norm = normalize_plate(schedule.plate)
             entry = (
                 Entry.query.filter(
-                    db.func.replace(db.func.upper(Entry.plate), '-', '')
+                    db.func.replace(
+                        db.func.replace(db.func.upper(Entry.plate), '-', ''),
+                        ' ',
+                        '',
+                    )
                     == plate_norm
                 )
                 .outerjoin(Exit)
@@ -197,10 +214,15 @@ def create_app():
             activity=data.get('activity'),
             observation=data.get('observation'),
         )
-        plate_norm = schedule.plate.replace('-', '').upper()
+        plate_norm = normalize_plate(schedule.plate)
         open_entry = (
             Entry.query.filter(
-                db.func.replace(db.func.upper(Entry.plate), '-', '') == plate_norm
+                db.func.replace(
+                    db.func.replace(db.func.upper(Entry.plate), '-', ''),
+                    ' ',
+                    '',
+                )
+                == plate_norm
             )
             .outerjoin(Exit)
             .filter(Exit.id.is_(None))
@@ -231,10 +253,14 @@ def create_app():
         data = request.get_json() if request.is_json else request.form
         entry = schedule.entry
         if entry is None or entry.exit:
-            plate_norm = schedule.plate.replace('-', '').upper()
+            plate_norm = normalize_plate(schedule.plate)
             entry = (
                 Entry.query.filter(
-                    db.func.replace(db.func.upper(Entry.plate), '-', '')
+                    db.func.replace(
+                        db.func.replace(db.func.upper(Entry.plate), '-', ''),
+                        ' ',
+                        '',
+                    )
                     == plate_norm
                 )
                 .outerjoin(Exit)
