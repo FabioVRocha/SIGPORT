@@ -3,78 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Inicial - SIGPORT</title>
-    <!-- Carrega o CDN do Tailwind CSS para estilização rápida e responsiva -->
+    <title>SIGPORT</title>
+    <!-- Inclui o Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Define a fonte Inter para todo o documento -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Inclui o Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Define a fonte Inter para todo o corpo da página para consistência visual */
+        /* Define a fonte Inter para todo o corpo */
         body {
             font-family: 'Inter', sans-serif;
         }
     </style>
 </head>
-<!-- O corpo da página usa flexbox para centralizar o conteúdo vertical e horizontalmente -->
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <!-- Contêiner principal com fundo branco, cantos arredondados e sombra, similar ao formulário -->
-    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-sm space-y-8">
-        <!-- Logo do sistema -->
-        <div class="flex justify-center mb-6">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo SIGPORT" class="h-32">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="relative bg-white shadow-lg rounded-2xl w-full max-w-sm overflow-hidden border border-gray-200">
+        <!-- Faixa azul superior (Header) -->
+        <div class="bg-blue-600 text-white p-4 flex items-center justify-between rounded-t-2xl">
+            <h1 class="text-2xl font-semibold">SIGPORT</h1>
+            <!-- Ícone de seta (utilizando Font Awesome) -->
+            <i class="fas fa-chevron-right text-xl"></i>
         </div>
-        <!-- O título 'SIGPORT' foi removido daqui. -->
-        <!-- Grade para os botões de navegação, com espaçamento maior -->
-        <div class="grid grid-cols-2 gap-6">
-            <!-- Botão de Entrada -->
-            {% if 'entries' in permissions or is_admin %}
-            <a href="/entries/list" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm
-                    hover:bg-blue-50 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 ease-in-out group">
-                <!-- Ícone moderno para Entrada (Heroicon: ArrowDown) -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                     class="w-12 h-12 text-blue-600 group-hover:text-blue-700 transition duration-200 ease-in-out">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
-                </svg>
-                <span class="mt-4 text-md font-semibold text-gray-800 group-hover:text-blue-800 transition duration-200 ease-in-out">Entrada</span>
-            </a>
-            {% endif %}
 
-            <!-- Botão de Saída -->
-            {% if 'exits' in permissions or is_admin %}
-            <a href="/exits/list" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm
-                    hover:bg-red-50 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 ease-in-out group">
-                <!-- Ícone moderno para Saída (Heroicon: ArrowUp) -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                     class="w-12 h-12 text-red-600 group-hover:text-red-700 transition duration-200 ease-in-out">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
-                </svg>
-                <span class="mt-4 text-md font-semibold text-gray-800 group-hover:text-red-800 transition duration-200 ease-in-out">Saída</span>
-            </a>
-            {% endif %}
+        <!-- Área de conteúdo principal com os botões -->
+        <div class="p-6">
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Botão Entrada -->
+                <button class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
+                    <!-- Ícone de entrada (utilizando Font Awesome) -->
+                    <i class="fas fa-sign-in-alt text-4xl text-gray-700 mb-2"></i>
+                    <span class="text-lg font-medium text-gray-800">Entrada</span>
+                </button>
 
-            <!-- Botão de Agendar Saída -->
-            {% if 'schedules' in permissions or is_admin %}
-            <a href="/schedules/new" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm
-                    hover:bg-green-50 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 ease-in-out group">
-                <!-- Ícone moderno para Agendar Saída (Heroicon: CalendarDays) -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                     class="w-12 h-12 text-green-600 group-hover:text-green-700 transition duration-200 ease-in-out">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12v-.008zM12 18h.008v.008H12v-.008zM12 21h.008v.008H12v-.008zM15 15h.008v.008H15v-.008zM15 18h.008v.008H15v-.008zM15 21h.008v.008H15v-.008zM18 15h.008v.008H18v-.008zM18 18h.008v.008H18v-.008zM18 21h.008v.008H18v-.008zM21 15h.008v.008H21v-.008zM21 18h.008v.008H21v-.008zM21 21h.008v.008H21v-.008zM3 15h.008v.008H3v-.008zM3 18h.008v.008H3v-.008zM3 21h.008v.008H3v-.008zM6 15h.008v.008H6v-.008zM6 18h.008v.008H6v-.008zM6 21h.008v.008H6v-.008zM9 15h.008v.008H9v-.008zM9 18h.008v.008H9v-.008zM9 21h.008v.008H9v-.008z" />
-                </svg>
-                <span class="mt-4 text-md font-semibold text-gray-800 group-hover:text-green-800 transition duration-200 ease-in-out">Agendar Saída</span>
-            </a>
-            {% endif %}
+                <!-- Botão Saída -->
+                <button class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
+                    <!-- Ícone de saída (utilizando Font Awesome) -->
+                    <i class="fas fa-sign-out-alt text-4xl text-gray-700 mb-2"></i>
+                    <span class="text-lg font-medium text-gray-800">Saída</span>
+                </button>
 
-            <!-- Botão de Cadastro -->
-            {% if 'cadastro' in permissions or is_admin %}
-            <a href="/cadastro" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm
-                    hover:bg-purple-50 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 ease-in-out group">
-                <!-- Ícone moderno para Cadastro (Heroicon: UserPlus) -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                     class="w-12 h-12 text-purple-600 group-hover:text-purple-700 transition duration-200 ease-in-out">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2.25-7.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4.5 21a6.75 6.75 0 1113.5 0v-.75A2.25 2.25 0 0015.75 18h-7.5A2.25 2.25 0 006 20.25V21" />
-                </svg>
-                <span class="mt-4 text-md font-semibold text-gray-800 group-hover:text-purple-800 transition duration-200 ease-in-out">Cadastro</span>
-            </a>
-            {% endif %}
+                <!-- Botão Agendamento -->
+                <button class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
+                    <!-- Ícone de agendamento (calendário) (utilizando Font Awesome) -->
+                    <i class="fas fa-calendar-alt text-4xl text-gray-700 mb-2"></i>
+                    <span class="text-lg font-medium text-gray-800">Agendamento</span>
+                </button>
+
+                <!-- Botão Cadastro -->
+                <button class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
+                    <!-- Ícone de cadastro (usuário) (utilizando Font Awesome) -->
+                    <i class="fas fa-user-plus text-4xl text-gray-700 mb-2"></i>
+                    <span class="text-lg font-medium text-gray-800">Cadastro</span>
+                </button>
+            </div>
+
+            <!-- Botão Logoff -->
+            <div class="mt-8 text-center">
+                <button class="text-blue-600 font-semibold text-lg hover:text-blue-800 transition-colors duration-200">
+                    Logoff
+                </button>
+            </div>
         </div>
     </div>
 </body>
