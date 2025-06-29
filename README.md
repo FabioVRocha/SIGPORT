@@ -64,3 +64,7 @@ login e utilize os demais links diretos para:
 - `/entries/new` — registro de entrada
 - `/entries/<id>/exit/new` — registrar saída de uma entrada existente
 - `/schedules/new` — agendar saída
+
+## Empacotar em APK
+
+Para executar o SIGPORT em dispositivos Android, é possível criar um aplicativo Cordova que apenas exibe a interface web existente. Consulte `docs/cordova_webview.md` para um passo a passo de configuração e geração do APK.
