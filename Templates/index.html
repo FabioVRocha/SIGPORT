@@ -27,42 +27,50 @@
         </div>
 
         <!-- Área de conteúdo principal com os botões -->
-        <div class="p-6">
+            <div class="p-6">
             <div class="grid grid-cols-2 gap-4">
                 <!-- Botão Entrada -->
-                <button class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
+                {% if 'entries' in permissions or is_admin %}
+                <a href="/entries/list" class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
                     <!-- Ícone de entrada (utilizando Font Awesome) -->
                     <i class="fas fa-sign-in-alt text-4xl text-gray-700 mb-2"></i>
                     <span class="text-lg font-medium text-gray-800">Entrada</span>
-                </button>
+                </a>
+                {% endif %}
 
                 <!-- Botão Saída -->
-                <button class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
+                {% if 'exits' in permissions or is_admin %}
+                <a href="/exits/list" class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
                     <!-- Ícone de saída (utilizando Font Awesome) -->
                     <i class="fas fa-sign-out-alt text-4xl text-gray-700 mb-2"></i>
                     <span class="text-lg font-medium text-gray-800">Saída</span>
-                </button>
+                </a>
+                {% endif %}
 
                 <!-- Botão Agendamento -->
-                <button class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
+                {% if 'schedules' in permissions or is_admin %}
+                <a href="/schedules/new" class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
                     <!-- Ícone de agendamento (calendário) (utilizando Font Awesome) -->
                     <i class="fas fa-calendar-alt text-4xl text-gray-700 mb-2"></i>
                     <span class="text-lg font-medium text-gray-800">Agendamento</span>
-                </button>
+                </a>
+                {% endif %}
 
                 <!-- Botão Cadastro -->
-                <button class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
+                {% if 'cadastro' in permissions or is_admin %}
+                <a href="/cadastro" class="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-105">
                     <!-- Ícone de cadastro (usuário) (utilizando Font Awesome) -->
                     <i class="fas fa-user-plus text-4xl text-gray-700 mb-2"></i>
                     <span class="text-lg font-medium text-gray-800">Cadastro</span>
-                </button>
+                </a>
+                {% endif %}
             </div>
 
             <!-- Botão Logoff -->
             <div class="mt-8 text-center">
-                <button class="text-blue-600 font-semibold text-lg hover:text-blue-800 transition-colors duration-200">
+                <a href="/" class="text-blue-600 font-semibold text-lg hover:text-blue-800 transition-colors duration-200">
                     Logoff
-                </button>
+                </a>
             </div>
         </div>
     </div>
